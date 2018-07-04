@@ -10,7 +10,8 @@ export default class Index extends Component {
       postDate: 'July 3',
       progressTime: 20,
       color1: '#0670DA',
-      color2: '#9845D9'
+      color2: '#9845D9',
+      imageURL: 'https://i.imgur.com/WhiCkO9.png'
     }
   }
 
@@ -41,7 +42,10 @@ export default class Index extends Component {
           <meta name='viewport' content='initial-scale=1.0, width=device-width' />
         </Head>
         <div className='root'>
-          <div className='content'>stuff here</div>
+          <div className='content'>
+            <img src={this.state.imageURL} />
+          </div>
+
           <div className='meta'>
             <div className='description'>
               <h1>{this.state.title}</h1>
@@ -55,29 +59,63 @@ export default class Index extends Component {
             </div>
           </div>
           <style jsx>{`
-            body {
-              margin: 0;
-              padding: 0;
-            }
-
             .content {
-              position: absolute;
-              left: 0;
-              top: 0;
-              background: green;
+              position: relative;
+              background: black;
               width: 70vw;
               height: 100vh;
-              background: linear-gradient(180deg, ${this.state.color1}, ${this.state.color2});
-              background-size: 400% 400%;
-              -webkit-animation: gradient-animation 10s ease infinite;
-              -moz-animation: gradient-animation 10s ease infinite;
-              animation: gradient-animation 10s ease infinite;
+              background: linear-gradient(45deg, ${this.state.color1}, ${this.state.color2});
+              background-size: 200% 200%;
+              -webkit-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
+              -moz-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
+              animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
+            }
+
+            @-webkit-keyframes gradient-animation {
+              0% { background-position: 0% 50% }
+              50% { background-position: 100% 50% }
+              100% { background-position: 0% 50% }
             }
 
             @keyframes gradient-animation {
               0% { background-position: 0% 50% }
               50% { background-position: 100% 50% }
               100% { background-position: 0% 50% }
+            }
+
+            .content img {
+              position: absolute;
+              will-change: transform, opacity;
+              top: 100px;
+              left: 100px;
+              height: calc(100vh - 200px);
+              box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.1);
+              border-radius: 3px;
+              animation: image-move ${this.state.progressTime}s linear infinite;
+            }
+
+            @keyframes image-move {
+              0% { transform: translateX(calc(-25%)); }
+              95% {
+                transform: translateX(0);
+                opacity: 1;
+              }
+              100% {
+                transform: translateX(50px);
+                opacity: 0;
+              }
+            }
+
+            @-webkit-keyframes image-move {
+              0% { -webkit-transform: translateX(calc(-25%)); }
+              95% {
+                -webkit-transform: translateX(0);
+                opacity: 1;
+              }
+              100% {
+                transform: translateX(50px);
+                opacity: 0;
+              }
             }
 
             .meta {
@@ -120,10 +158,9 @@ export default class Index extends Component {
               margin: 0;
               background-color: #B3B5B9;
               border-radius: 5px;
-              width: ${this.state.percent}%;
               min-width: 10px;
               max-width: 100%;
-              animation: progress-animation ${this.state.progressTime + 2}s linear infinite;
+              animation: progress-animation ${this.state.progressTime}s linear infinite;
             }
 
             @keyframes progress-animation {
@@ -169,6 +206,8 @@ export default class Index extends Component {
           <style global jsx>{`
             body {
               background: black;
+              padding: 0;
+              margin: 0;
             }
           `}</style>
         </div>
