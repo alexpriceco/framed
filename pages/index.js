@@ -1,33 +1,65 @@
 import { Component } from 'react'
 import Head from 'next/head'
 
+import config from '../config/firebase-api-key.js'
+import firebase from 'firebase/app'
+require('firebase/firestore')
+require('firebase/auth')
+
+if (!firebase.apps.length) {
+  console.log(
+    '%cCreating a new firebase instance...',
+    'color: grey; font-style: italic'
+  )
+
+  console.debug(config)
+  firebase.initializeApp(config)
+}
+
 export default class Index extends Component {
   constructor (props, context) {
     super(props, context)
     this.state = {
-      title: 'Detailed maps',
-      description: 'Having clearer access to data, through graphs, well horizontals, and intentionally organized data panels helps customers make decisions faster.',
-      postDate: 'July 3',
+      posts: [{
+        title: '',
+        description: '',
+        postDate: '',
+        color1: '#EFEFF1',
+        color2: '#DEDEE0',
+        imageURL: ''
+      }],
+
+      i: 0,
       progressTime: 20,
-      color1: '#0670DA',
-      color2: '#9845D9',
-      imageURL: 'https://i.imgur.com/WhiCkO9.png'
+      baseURL: 'mineralsoft'
     }
   }
 
   componentDidMount () {
-    const secondsLive = 30
-    this.timer = setInterval(() => {
-      const oldPercent = this.state.percent
-      if (oldPercent >= 100) {
-        // switch to next image
-        this.setState({ percent: 0 })
-      } else {
-        const increment = 100 / secondsLive
-        this.setState({ percent: oldPercent + increment })
-      }
-      this.setState({ time: this.getTimeString() })
-    }, 1000)
+    this.getDataFromFirebase()
+    // .then((data) => {
+    //   this.setState({
+    //     loading: false,
+    //     data
+    //   })
+    // }).catch((error) => {
+    //   this.setState({
+    //     loading: false,
+    //     error
+    //   })
+    // })
+  }
+
+  async getDataFromFirebase () {
+    const collection = firebase.firestore().collection(this.state.baseURL)
+    collection.orderBy('postDate').limit(3).get().then(snapshot => {
+      let posts = []
+      snapshot.forEach(post => {
+        posts.push(post.data())
+      })
+
+      this.setState({ posts })
+    })
   }
 
   componentWillUnmount () {
@@ -35,6 +67,8 @@ export default class Index extends Component {
   }
 
   render () {
+    const { posts, i } = this.state
+
     return (
       <div>
         <Head>
@@ -43,19 +77,24 @@ export default class Index extends Component {
         </Head>
         <div className='root'>
           <div className='content'>
-            <img src={this.state.imageURL} />
+            <img src={posts[i].imageURL} />
           </div>
 
           <div className='meta'>
             <div className='description'>
-              <h1>{this.state.title}</h1>
-              <h2>{this.state.description}</h2>
+              <h1>{posts[i].title}</h1>
+              <h2>{posts[i].description}</h2>
             </div>
             <div className='progress'>
               <div className='percent' />
             </div>
             <div className='shared-via'>
-              <h2>Posted {this.state.postDate} in #design on</h2> {SlackIcon}
+              <h2>Posted {
+                posts[i].postDate ? posts[i].postDate.toLocaleTimeString('en-US', {
+                  month: 'long',
+                  day: 'numeric'
+                }).split(',')[0] : ''
+              } in #design on</h2> {SlackIcon}
             </div>
           </div>
           <style jsx>{`
@@ -64,7 +103,7 @@ export default class Index extends Component {
               background: black;
               width: 70vw;
               height: 100vh;
-              background: linear-gradient(45deg, ${this.state.color1}, ${this.state.color2});
+              background: linear-gradient(45deg, ${posts[i].color1}, ${posts[i].color2});
               background-size: 200% 200%;
               -webkit-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
               -moz-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
