@@ -1,6 +1,8 @@
 import { Component } from 'react'
 import Head from 'next/head'
 
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+
 import config from '../config/firebase-api-key.js'
 import firebase from 'firebase/app'
 require('firebase/firestore')
@@ -30,7 +32,7 @@ export default class Index extends Component {
       }],
 
       i: 0,
-      progressTime: 20,
+      progressTime: 10,
       baseURL: 'mineralsoft'
     }
   }
@@ -48,6 +50,13 @@ export default class Index extends Component {
     //     error
     //   })
     // })
+
+    window.setInterval(() => {
+      const i = this.state.i === this.state.posts.length - 1
+        ? 0 : this.state.i + 1
+
+      this.setState({ i })
+    }, this.state.progressTime * 1000)
   }
 
   async getDataFromFirebase () {
@@ -81,10 +90,27 @@ export default class Index extends Component {
           </div>
 
           <div className='meta'>
-            <div className='description'>
-              <h1>{posts[i].title}</h1>
-              <h2>{posts[i].description}</h2>
-            </div>
+            <ReactCSSTransitionGroup
+              className='description'
+              component='div'
+              style={{
+                'flexGrow': '1',
+                'display': 'flex',
+                'flexDirection': 'column',
+                'justifyContent': 'center',
+                'paddingBottom': '100px'
+              }}
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}
+              transitionName={{
+                enter: 'enter',
+                leave: 'leave'
+              }}>
+              <div key={new Date().toISOString()}>
+                <h1>{posts[i].title}</h1>
+                <h2>{posts[i].description}</h2>
+              </div>
+            </ReactCSSTransitionGroup>
             <div className='progress'>
               <div className='percent' />
             </div>
@@ -172,14 +198,6 @@ export default class Index extends Component {
               flex-direction: column;
             }
 
-            .meta .description {
-              flex-grow: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              padding-bottom: 100px;
-            }
-
             .meta .progress {
               background: #efeff1;
               width: calc(100% - 40px);
@@ -208,25 +226,6 @@ export default class Index extends Component {
               100% { width: 0% }
             }
 
-            h1 {
-              font-family: 'Roboto', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              line-height: normal;
-              font-size: 32px;
-              color: #181D23;
-            }
-
-            h2 {
-              font-family: 'Roboto', sans-serif;
-              font-style: normal;
-              font-weight: normal;
-              line-height: 35px;
-              font-size: 24px;
-              color: #77797F;
-              margin: 12px 0;
-            }
-
             .shared-via {
               text-align: center;
             }
@@ -247,6 +246,60 @@ export default class Index extends Component {
               background: black;
               padding: 0;
               margin: 0;
+            }
+
+            h1 {
+              font-family: 'Roboto', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              line-height: normal;
+              font-size: 32px;
+              color: #181D23;
+            }
+
+            h2 {
+              font-family: 'Roboto', sans-serif;
+              font-style: normal;
+              font-weight: normal;
+              line-height: 35px;
+              font-size: 24px;
+              color: #77797F;
+              margin: 12px 0;
+            }
+
+            .description > div {
+              transition: all 500ms ease;
+              position: absolute;
+              left: 100px;
+              top: 50%;
+              transform: translate(0, calc(-50% - 100px));
+              width: calc(100% - 200px);
+            }
+
+            .description > .enter {
+              opacity: 0.01;
+              transition-delay: 150ms;
+              transform: translate(-25px, calc(-50% - 100px));
+              -webkit-transform: translate(-25px, calc(-50% - 100px));
+            }
+
+            .description > .enter.enter-active {
+              opacity: 1;
+              transform: translate(0, calc(-50% - 100px));
+              -webkit-transform: translate(0, calc(-50% - 100px));
+            }
+
+            .description > .leave {
+              opacity: 1;
+              transition: all 300ms ease;
+              transform: translate(0, calc(-50% - 100px));
+              -webkit-transform: translate(0, calc(-50% - 100px));
+            }
+
+            .description > .leave.leave-active {
+              opacity: 0.01;
+              transform: translate(25px, calc(-50% - 100px));
+              -webkit-transform: translate(25px, calc(-50% - 100px));
             }
           `}</style>
         </div>
