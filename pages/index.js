@@ -33,7 +33,9 @@ export default class Index extends Component {
 
       i: 0,
       progressTime: 10,
-      baseURL: 'mineralsoft'
+      baseURL: 'mineralsoft',
+      startShow: false,
+      loaded: false
     }
   }
 
@@ -51,7 +53,11 @@ export default class Index extends Component {
     //   })
     // })
 
-    window.setInterval(() => {
+    setTimeout(() => {
+      this.setState({ startShow: true })
+    }, 350)
+
+    setInterval(() => {
       const i = this.state.i === this.state.posts.length - 1
         ? 0 : this.state.i + 1
 
@@ -111,7 +117,7 @@ export default class Index extends Component {
                 <h2>{posts[i].description}</h2>
               </div>
             </ReactCSSTransitionGroup>
-            <div className='progress'>
+            <div className={this.state.startShow ? 'progress' : ''}>
               <div className='percent' />
             </div>
             <div className='shared-via'>
@@ -205,6 +211,8 @@ export default class Index extends Component {
               height: 10px;
               margin: 20px;
               position: relative;
+              overflow: hidden;
+              z-index: 1;
             }
 
             .meta .progress .percent {
@@ -215,15 +223,25 @@ export default class Index extends Component {
               margin: 0;
               background-color: #B3B5B9;
               border-radius: 5px;
-              min-width: 10px;
-              max-width: 100%;
-              animation: progress-animation ${this.state.progressTime}s linear infinite;
+              width: 100%;
+              transform: translateX(-100%);
+              animation-name: progress-fade, progress-animation;
+              animation-delay: ${this.state.progressTime - 0.35}s, .35s;
+              animation-duration: .35s, ${this.state.progressTime - 0.35}s;
+
+              animation-timing-function: ease, linear;
+              animation-iteration-count: infinite, infinite;
+              animation-fill-mode: forwards, forwards;
             }
 
             @keyframes progress-animation {
-              0% { width: 0% }
-              98% { width: 100% }
-              100% { width: 0% }
+              from { transform: translateX(-100%); }
+              to { transform: translateX(0); }
+            }
+
+            @keyframes progress-fade {
+              from { opacity: 1; }
+              to { opacity: 0; }
             }
 
             .shared-via {
