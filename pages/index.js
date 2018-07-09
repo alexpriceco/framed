@@ -53,16 +53,18 @@ export default class Index extends Component {
     //   })
     // })
 
-    setTimeout(() => {
+    let timeout = setTimeout(() => {
       this.setState({ startShow: true })
     }, 350)
 
-    setInterval(() => {
+    let interval = setInterval(() => {
       const i = this.state.i === this.state.posts.length - 1
         ? 0 : this.state.i + 1
 
       this.setState({ i })
     }, this.state.progressTime * 1000)
+
+    this.setState({ interval, timeout })
   }
 
   async getDataFromFirebase () {
@@ -78,11 +80,12 @@ export default class Index extends Component {
   }
 
   componentWillUnmount () {
-    clearInterval(this.timer)
+    clearInterval(this.state.interval)
+    clearTimeout(this.state.timeout)
   }
 
   render () {
-    const { posts, i } = this.state
+    const { posts, i, progressTime } = this.state
 
     return (
       <div>
@@ -91,35 +94,50 @@ export default class Index extends Component {
           <meta name='viewport' content='initial-scale=1.0, width=device-width' />
         </Head>
         <div className='root'>
-          <div className='content'>
-            <img src={posts[i].imageURL} />
-          </div>
+          <ReactCSSTransitionGroup
+            className='content'
+            transitionName={{
+              enter: 'enter',
+              leave: 'leave'
+            }}
+            transitionEnterTimeout={1500}
+            transitionLeaveTimeout={500}
+            component='div'
+          >
+            <div key={posts[i].imageURL} />
+            {/* <img  src={posts[i].imageURL} /> */}
+          </ReactCSSTransitionGroup>
 
           <div className='meta'>
             <ReactCSSTransitionGroup
               className='description'
-              component='div'
-              style={{
-                'flexGrow': '1',
-                'display': 'flex',
-                'flexDirection': 'column',
-                'justifyContent': 'center',
-                'paddingBottom': '100px'
-              }}
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={500}
               transitionName={{
                 enter: 'enter',
                 leave: 'leave'
-              }}>
+              }}
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={300}
+              component='div'
+            >
               <div key={new Date().toISOString()}>
                 <h1>{posts[i].title}</h1>
                 <h2>{posts[i].description}</h2>
               </div>
             </ReactCSSTransitionGroup>
-            <div className={this.state.startShow ? 'progress' : ''}>
-              <div className='percent' />
-            </div>
+
+            <ReactCSSTransitionGroup
+              className='progress'
+              transitionName={{
+                enter: 'enter',
+                leave: 'leave'
+              }}
+              transitionEnterTimeout={350}
+              transitionLeaveTimeout={350}
+              component='div'
+            >
+              <div className='percent' key={`indicator-${i}`} />
+            </ReactCSSTransitionGroup>
+
             <div className='shared-via'>
               <h2>Posted {
                 posts[i].postDate ? posts[i].postDate.toLocaleTimeString('en-US', {
@@ -130,65 +148,6 @@ export default class Index extends Component {
             </div>
           </div>
           <style jsx>{`
-            .content {
-              position: relative;
-              background: black;
-              width: 70vw;
-              height: 100vh;
-              background: linear-gradient(45deg, ${posts[i].color1}, ${posts[i].color2});
-              background-size: 200% 200%;
-              -webkit-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
-              -moz-animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
-              animation: gradient-animation ${this.state.progressTime / 2}s ease infinite;
-            }
-
-            @-webkit-keyframes gradient-animation {
-              0% { background-position: 0% 50% }
-              50% { background-position: 100% 50% }
-              100% { background-position: 0% 50% }
-            }
-
-            @keyframes gradient-animation {
-              0% { background-position: 0% 50% }
-              50% { background-position: 100% 50% }
-              100% { background-position: 0% 50% }
-            }
-
-            .content img {
-              position: absolute;
-              will-change: transform, opacity;
-              top: 100px;
-              left: 100px;
-              height: calc(100vh - 200px);
-              box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.1);
-              border-radius: 3px;
-              animation: image-move ${this.state.progressTime}s linear infinite;
-            }
-
-            @keyframes image-move {
-              0% { transform: translateX(calc(-25%)); }
-              95% {
-                transform: translateX(0);
-                opacity: 1;
-              }
-              100% {
-                transform: translateX(50px);
-                opacity: 0;
-              }
-            }
-
-            @-webkit-keyframes image-move {
-              0% { -webkit-transform: translateX(calc(-25%)); }
-              95% {
-                -webkit-transform: translateX(0);
-                opacity: 1;
-              }
-              100% {
-                transform: translateX(50px);
-                opacity: 0;
-              }
-            }
-
             .meta {
               background: #FFFFFF;
               height: 100vh;
@@ -202,46 +161,6 @@ export default class Index extends Component {
               box-sizing: border-box;
               display: flex;
               flex-direction: column;
-            }
-
-            .meta .progress {
-              background: #efeff1;
-              width: calc(100% - 40px);
-              border-radius: 5px;
-              height: 10px;
-              margin: 20px;
-              position: relative;
-              overflow: hidden;
-              z-index: 1;
-            }
-
-            .meta .progress .percent {
-              position: absolute;
-              left: 0;
-              top: 0;
-              height: 10px;
-              margin: 0;
-              background-color: #B3B5B9;
-              border-radius: 5px;
-              width: 100%;
-              transform: translateX(-100%);
-              animation-name: progress-fade, progress-animation;
-              animation-delay: ${this.state.progressTime - 0.35}s, .35s;
-              animation-duration: .35s, ${this.state.progressTime - 0.35}s;
-
-              animation-timing-function: ease, linear;
-              animation-iteration-count: infinite, infinite;
-              animation-fill-mode: forwards, forwards;
-            }
-
-            @keyframes progress-animation {
-              from { transform: translateX(-100%); }
-              to { transform: translateX(0); }
-            }
-
-            @keyframes progress-fade {
-              from { opacity: 1; }
-              to { opacity: 0; }
             }
 
             .shared-via {
@@ -285,39 +204,140 @@ export default class Index extends Component {
               margin: 12px 0;
             }
 
+            .content {
+              position: relative;
+              background: black;
+              width: 70vw;
+              height: 100vh;
+              background: linear-gradient(45deg, blue, orange);
+              background-size: 200% 200%;
+              animation: gradient-animation ${progressTime / 2}s ease infinite;
+            }
+
+            @keyframes gradient-animation {
+              0% { background-position: 0% 50% }
+              50% { background-position: 100% 50% }
+              100% { background-position: 0% 50% }
+            }
+
+            .content div {
+              position: absolute;
+              top: 100px;
+              left: 100px;
+              height: calc(100vh - 200px);
+              width: 100vh;
+              background-color: black;
+              border-radius: 3px;
+              transform: translateX(0);
+              opacity: 1;
+              transition:
+                transform ${progressTime - 1}s linear,
+                opacity 0.5s ease;
+            }
+
+            .content > div.leave {
+              transition: all 0.5s ease;
+              transform: translateX(0);
+              opacity: 1;
+            }
+
+            .content > div.leave.leave-active {
+              transform: translateX(25%);
+              opacity: 0;
+            }
+
+            .content > div.enter {
+              transform: translateX(calc(-100% - 100px));
+              opacity: 0;
+            }
+
+            .content > div.enter.enter-active {
+              transition: all 1s ease 0.5s;
+              transform: translateX(-50%);
+              opacity: 1;
+            }
+
+            .description {
+              flex-grow: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding-bottom: 100px;
+            }
+
             .description > div {
               transition: all 500ms ease;
               position: absolute;
               left: 100px;
               top: 50%;
-              transform: translate(0, calc(-50% - 100px));
+              transform: translate(0, calc(-50% - 50px));
               width: calc(100% - 200px);
             }
 
             .description > .enter {
               opacity: 0.01;
               transition-delay: 150ms;
-              transform: translate(-25px, calc(-50% - 100px));
-              -webkit-transform: translate(-25px, calc(-50% - 100px));
+              transform: translate(-25px, calc(-50% - 50px));
+              -webkit-transform: translate(-25px, calc(-50% - 50px));
             }
 
             .description > .enter.enter-active {
               opacity: 1;
-              transform: translate(0, calc(-50% - 100px));
-              -webkit-transform: translate(0, calc(-50% - 100px));
+              transform: translate(0, calc(-50% - 50px));
+              -webkit-transform: translate(0, calc(-50% - 50px));
             }
 
             .description > .leave {
               opacity: 1;
               transition: all 300ms ease;
-              transform: translate(0, calc(-50% - 100px));
-              -webkit-transform: translate(0, calc(-50% - 100px));
+              transform: translate(0, calc(-50% - 50px));
+              -webkit-transform: translate(0, calc(-50% - 50px));
             }
 
             .description > .leave.leave-active {
               opacity: 0.01;
-              transform: translate(25px, calc(-50% - 100px));
-              -webkit-transform: translate(25px, calc(-50% - 100px));
+              transform: translate(25px, calc(-50% - 50px));
+              -webkit-transform: translate(25px, calc(-50% - 50px));
+            }
+
+            .meta .progress {
+              background: #efeff1;
+              width: calc(100% - 40px);
+              border-radius: 5px;
+              height: 10px;
+              margin: 20px;
+              position: relative;
+              overflow: hidden;
+              z-index: 1;
+            }
+
+            .meta .progress .percent {
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 10px;
+              margin: 0;
+              background-color: #B3B5B9;
+              border-radius: 5px;
+              width: 100%;
+              animation-name: progress-animation;
+              animation-duration: ${progressTime - 0.35}s;
+              animation-timing-function: linear;
+              animation-direction: both;
+              transition: all 1s ease;
+            }
+
+            .progress > .percent.leave {
+              opacity: 1;
+            }
+
+            .progress > .percent.leave.leave-active {
+              opacity: 0;
+            }
+
+            @keyframes progress-animation {
+              from { transform: translateX(-100%); }
+              to { transform: translateX(0); }
             }
           `}</style>
         </div>
