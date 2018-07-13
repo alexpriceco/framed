@@ -104,8 +104,9 @@ export default class Index extends Component {
             transitionLeaveTimeout={500}
             component='div'
           >
-            <div key={posts[i].imageURL} />
-            {/* <img  src={posts[i].imageURL} /> */}
+            <div key={posts[i].imageURL} style={{
+              backgroundImage: `url:(${posts[i].imageURL})`
+            }} />
           </ReactCSSTransitionGroup>
 
           <div className='meta'>
