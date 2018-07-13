@@ -93,6 +93,7 @@ export default class Index extends Component {
           <title>Framed</title>
           <meta name='viewport' content='initial-scale=1.0, width=device-width' />
         </Head>
+        {console.debug(posts[i].imageURL)}
         <div className='root'>
           <ReactCSSTransitionGroup
             className='content'
@@ -104,9 +105,14 @@ export default class Index extends Component {
             transitionLeaveTimeout={500}
             component='div'
           >
-            <div key={posts[i].imageURL + new Date().toISOString()} style={{
-              backgroundImage: `url:(${posts[i].imageURL})`
-            }} />
+            <div key={posts[i].imageURL + new Date().toISOString()}
+              style={{
+                background: `url(${posts[i].imageURL})`,
+                backgroundPosition: '50% 50%',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'contain'
+              }}
+            />
           </ReactCSSTransitionGroup>
 
           <div className='meta'>
