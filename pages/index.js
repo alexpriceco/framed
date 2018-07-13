@@ -100,11 +100,11 @@ export default class Index extends Component {
               enter: 'enter',
               leave: 'leave'
             }}
-            transitionEnterTimeout={1500}
+            transitionEnterTimeout={1000}
             transitionLeaveTimeout={500}
             component='div'
           >
-            <div key={posts[i].imageURL} style={{
+            <div key={posts[i].imageURL + new Date().toISOString()} style={{
               backgroundImage: `url:(${posts[i].imageURL})`
             }} />
           </ReactCSSTransitionGroup>
@@ -230,20 +230,18 @@ export default class Index extends Component {
               background-color: black;
               border-radius: 3px;
               transform: translateX(0);
-              opacity: 1;
               transition:
-                transform ${progressTime - 1}s linear,
+                transform ${progressTime - 1.25}s linear,
                 opacity 0.5s ease;
             }
 
             .content > div.leave {
               transition: all 0.5s ease;
-              transform: translateX(0);
               opacity: 1;
             }
 
             .content > div.leave.leave-active {
-              transform: translateX(25%);
+              transform: translateX(100px);
               opacity: 0;
             }
 
