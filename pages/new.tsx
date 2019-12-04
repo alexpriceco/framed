@@ -4,7 +4,7 @@ import Layout from '../components/Layout'
 const Index: React.FunctionComponent = () => {
   return (
     <Layout>
-      <h1>Add a new thing</h1>
+      <h1>Add a new frame</h1>
     </Layout>
   )
 }
