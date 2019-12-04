@@ -1,6 +1,10 @@
+const { parsed: localEnv } = require('dotenv').config()
+const webpack = require('webpack')
+
 module.exports = {
   target: 'serverless',
-  env: {
-    FIREBASE_KEY: process.env.FIREBASE_KEY
+  webpack(config) {
+    config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
+    return config
   }
 }

@@ -1,22 +1,28 @@
 import * as React from 'react'
 import Head from 'next/head'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 type LayoutProps = {
   title?: string
 }
+
+const fadeIn = keyframes`
+  from { opacity: 0 }
+  to { opacity: 1 }
+`
 
 const StyledLayout = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: flex-start;
+  animation: ${fadeIn} 0.25s linear 1;
 `
 
 const Layout: React.FunctionComponent<LayoutProps> = ({ children, title }) => (
   <StyledLayout>
     <Head>
-      <title>{title}</title>
+      <title>{title || 'Framed'}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>

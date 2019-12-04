@@ -12,17 +12,23 @@ class Index extends Component {
   }
   
   signInWithGoogle() {
+    firebase.auth().signOut().then(() => {
+      console.info('Sign out successful')
+    }).catch((error) => {
+      console.error(error)
+    });
+
     firebase.auth().signInWithPopup(provider).then((result) => {
       const user = result.user
       console.log(result, user)
     }).catch((error) => {
-      console.error(error)
+      console.error(error.code, error.message)
     })
   }
 
   render() {
     return (
-      <Layout title="Home">
+      <Layout title="Framed">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <h1 style={{ width: '50%', textAlign: 'center' }}>Get the latest design mocks, customer quotes, and more.</h1>
           <Button onClick={() => this.signInWithGoogle()} isLight>

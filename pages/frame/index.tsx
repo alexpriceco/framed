@@ -1,8 +1,10 @@
 import { Component } from 'react'
 import moment from 'moment'
 import Head from 'next/head'
+import Router from 'next/router'
 import Layout from '../../components/Layout'
 import Button from '../../components/Button'
+import firebase, { firestore } from '../../components/Firebase'
 
 import {
   CommentSection,
@@ -27,6 +29,27 @@ type State = Readonly<typeof initialState>
 
 class Frame extends Component {
   readonly state: State = initialState
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        firestore.collection('juniper-square')
+          .orderBy('published_on', 'desc').limit(1)
+          .get().then((snapshot) => {
+            const data = snapshot.docs[0].data()
+            this.setState({
+              author: data.author_name,
+              title: data.title,
+              publishedDate: data.published_on,
+              description: data.description,
+              source: data.media
+            })
+          })
+      } else {
+        Router.push({ pathname: '/' })
+      }
+    })
+  }
 
   handleCommentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const comment = e.target.value;
