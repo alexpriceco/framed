@@ -1,83 +1,31 @@
 import { Component } from 'react'
 import moment from 'moment'
-import styled from 'styled-components'
+import Head from 'next/head'
+import Layout from '../../components/Layout'
+import Button from '../../components/Button'
 
-import Layout from '../components/Layout'
-import Button from '../components/Button'
-import colors from '../components/colors'
-
-type Props = {
-  author: string,
-  publishDate: string,
-  description: string,
-  source: string,
-}
-
-type FramedProps = {
-  src: string,
-}
-
-const FramedContent = styled.img<FramedProps>`
-`
-
-const FrameSection = styled.section`
-  width: 60vw;
-  margin-left: 5vw;
-
-  > * {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-`
-
-const MetaDataSection = styled.section`
-  width: 25vw;
-`;
-
-const CommentSection = styled.div`
-  textarea {
-    width: 100%;
-    height: 192px;
-    border-radius: 8px;
-    outline: none;
-    border: none;
-    resize: none;
-    color: ${colors.white};
-    padding: 1em;
-    background: ${colors.greyDarkest};
-    margin-bottom: 10px;
-    box-sizing: border-box;
-
-    &:hover {
-      background: ${colors.greyDark};
-      &:focus { background: ${colors.greyDarkest}; }
-    }
-  }
-
-  div {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`
+import {
+  CommentSection,
+  MetaDataSection,
+  FrameSection,
+  FramedContent,
+} from './styles'
 
 const initialState = {
   commenting: false,
   commentSent: false,
   canSendFeedback: false,
   comment: '',
+  author: 'Alex',
+  title: 'Schweiz-Porsche',
+  publishDate: new Date('Jan 4, 2019'),
+  description: 'This is a shot of a classic Porsche, taken by Severin D. in Switzerland, and sourced from Unsplash.',
+  source: ['https://images.unsplash.com/photo-1567542770707-9398afccb7a5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80']
 }
+
 type State = Readonly<typeof initialState>
 
-class Frame extends Component<Props> {
-  static defaultProps = {
-    author: 'Alex',
-    publishDate: moment(new Date('Jan 4, 2019')).format('MMM D, YYYY'),
-    description: 'This is a shot of a classic Porsche, taken by Severin D. in Switzerland, and sourced from Unsplash.',
-    source: 'https://images.unsplash.com/photo-1567542770707-9398afccb7a5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
-  }
-
+class Frame extends Component {
   readonly state: State = initialState
 
   handleCommentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -92,9 +40,15 @@ class Frame extends Component<Props> {
     if (commenting) {
       return (
         <CommentSection>
-          <textarea autoFocus value={comment} onChange={(e) => this.handleCommentChange(e)} />
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <Button onClick={() => this.setState({ commenting: false })}>Cancel</Button>
+          <textarea
+            autoFocus
+            value={comment}
+            onChange={(e) => this.handleCommentChange(e)}
+          />
+          <div>
+            <Button onClick={() => this.setState({ commenting: false })}>
+              Cancel
+            </Button>
             <Button
               onClick={() => this.setState({ commenting: false, commentSent: true })}
               disabled={!canSendFeedback}
@@ -127,19 +81,21 @@ class Frame extends Component<Props> {
   }
 
   render() {
-    const { author, publishDate, source, description } = this.props
+    const { author, publishDate, source, description, title } = this.state
+    const formattedDate =  moment(publishDate).format('MMM D, YYYY')
     
     return (
       <Layout>
+        <Head><title>Framed | {title}</title></Head>
         <MetaDataSection>
-          <h2>Frame title</h2>
-          <p style={{ opacity: 0.5, marginBottom: '0.5em' }}>{author} / {publishDate}</p>
-          <p style={{ marginBottom: '2em' }}>{description}</p>
+          <h2>{title}</h2>
+          <p>{author} / {formattedDate}</p>
+          <p>{description}</p>
 
           {this.getCommentSection()}
         </MetaDataSection>
         <FrameSection>
-          <FramedContent src={source} />
+          <FramedContent src={source[0]} />
         </FrameSection>
       </Layout>
     )

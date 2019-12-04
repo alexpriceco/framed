@@ -4,7 +4,7 @@ import 'firebase/firestore'
 import 'firebase/storage'
 
 const config = {
-  apiKey: 'AIzaSyARwwnx3bAANVZeOWhYp5XXpSw8ULe4gBs',
+  apiKey: process.env.FIREBASE_KEY,
   authDomain: 'theframedapp.firebaseapp.com',
   projectId: 'theframedapp',
   databaseURL: 'https://theframedapp.firebaseio.com',
