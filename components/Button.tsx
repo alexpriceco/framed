@@ -8,6 +8,7 @@ type ButtonProps = {
   type?: 'button' | 'submit' | 'reset',
   name?: string,
   isLight?: boolean,
+  disabled?: boolean,
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -27,14 +28,27 @@ const StyledButton = styled.button<ButtonProps>`
   background: ${props => props.isLight ? colors.white : colors.greyDarkest};
   color: ${props => props.isLight ? colors.greyDarkest : colors.white};
 
+  &:focus { outline: none; }
+
   &:hover {
     background: ${props => props.isLight ? colors.greyLight : colors.greyDark};
     color: ${props => props.isLight ? colors.black : colors.white};
   }
+
+  &:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
 `
 
-const Button: React.FunctionComponent<ButtonProps> = ({ children, onClick, type, name, isLight }) => (
-  <StyledButton onClick={onClick} type={type || 'button'} name={name} isLight={isLight || false}>
+const Button: React.FunctionComponent<ButtonProps> = ({ children, onClick, type, name, isLight, disabled }) => (
+  <StyledButton
+    onClick={onClick}
+    type={type || 'button'}
+    name={name}
+    isLight={isLight || false}
+    disabled={disabled || false}
+  >
     {children}
   </StyledButton>
 )

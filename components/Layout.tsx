@@ -71,6 +71,15 @@ const Layout: React.FunctionComponent<LayoutProps> = ({ children, title }) => (
         margin-bottom: 1em;
         opacity: 0.75;
       }
+
+      textarea {
+        font-family: DM Sans;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 140%;
+        letter-spacing: 0.02em;
+      }
     `}</style>
     
     {children}
